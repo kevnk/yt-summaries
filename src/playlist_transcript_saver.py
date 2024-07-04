@@ -131,6 +131,17 @@ def get_or_update_cache(cache, video_id, video_info):
         }
     return cache[video_id]
 
+def copy_to_clipboard(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        subprocess.run(['pbcopy'], input=content.encode('utf-8'), check=True)
+        print(f"Content of {file_path} has been copied to clipboard.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error copying to clipboard: {e}")
+    except IOError as e:
+        print(f"Error reading file: {e}")
+
 def save_transcript_to_text(output_file, video_data):
     video_info = video_data['info']
     transcript = video_data['transcript']
@@ -151,6 +162,7 @@ def save_transcript_to_text(output_file, video_data):
                 f.write(f"{start_time:.2f}: {text}\n")
     
     print(f"Saved information for video '{video_info['title']}' to {output_file}")
+    copy_to_clipboard(output_file)
 
 def process_video(video_id, cache, channel_folder):
     video_info = get_video_info(video_id)
@@ -200,6 +212,7 @@ def process_playlist(playlist_id, cache, channel_folder):
             f.write("\n" + "="*50 + "\n\n")
     
     print(f"Saved information for playlist '{playlist_info['title']}' to {output_file}")
+    copy_to_clipboard(output_file)
 
 def extract_video_id(url):
     # Handle standard YouTube URLs
