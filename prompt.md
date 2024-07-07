@@ -63,14 +63,14 @@ Here's how to get the most out of this: [if applicable]
 Now, let's break down the key insights:
 
 • [Relevant Insight 1]: [Concise, intent-focused description with brief example if available]
-  https://www.youtube.com/watch?v=[VIDEO_ID_1]?t=[START_TIME]s ([CLIP_DURATION])
-  https://www.youtube.com/watch?v=[VIDEO_ID_2]?t=[START_TIME]s ([CLIP_DURATION]) [if applicable]
+  https://www.youtube.com/watch?v=[VIDEO_ID_1]?t=[START_TIME] ([CLIP_DURATION])
+  https://www.youtube.com/watch?v=[VIDEO_ID_2]?t=[START_TIME] ([CLIP_DURATION]) [if applicable]
 
 • [Relevant Insight 2]: [Concise, intent-focused description with brief example if available]
-  https://www.youtube.com/watch?v=[VIDEO_ID]?t=[START_TIME]s ([CLIP_DURATION])
+  https://www.youtube.com/watch?v=[VIDEO_ID]?t=[START_TIME] ([CLIP_DURATION])
 
 • [Relevant Insight 3]: [Concise, intent-focused description with brief example if available]
-  https://www.youtube.com/watch?v=[VIDEO_ID]?t=[START_TIME]s ([CLIP_DURATION])
+  https://www.youtube.com/watch?v=[VIDEO_ID]?t=[START_TIME] ([CLIP_DURATION])
 
 [Additional relevant insights as needed]
 
