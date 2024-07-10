@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ~/Sites/llm/youtube-summaries/
+
 # Activate virtual environment
 source venv/bin/activate
 
