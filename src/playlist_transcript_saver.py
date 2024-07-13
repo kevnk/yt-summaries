@@ -5,7 +5,8 @@ import subprocess
 from urllib.parse import parse_qs, urlparse
 from googleapiclient.discovery import build
 from youtube_transcript_api import YouTubeTranscriptApi
-
+import sys
+    
 # YouTube API key will be loaded from config file
 YOUTUBE_API_KEY = ''
 
@@ -215,22 +216,33 @@ def process_playlist(playlist_id, cache, channel_folder):
     copy_to_clipboard(output_file)
 
 def extract_video_id(url):
-    # Handle standard YouTube URLs
-    parsed_url = urlparse(url)
-    if parsed_url.netloc in ['www.youtube.com', 'youtube.com']:
-        query_params = parse_qs(parsed_url.query)
-        if 'v' in query_params:
-            return query_params['v'][0]
+    # Handle various YouTube URL formats
+    patterns = [
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)',
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)',
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^?]+)',
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([^?]+)',
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([^?]+)',
+        r'(?:https?:\/\/)?youtu\.be\/([^?]+)',
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\/([^?]+)'
+    ]
     
-    # Handle shortened YouTube URLs
-    if parsed_url.netloc == 'youtu.be':
-        return parsed_url.path.lstrip('/')
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1), None
     
-    return None
+    # Check for playlist
+    playlist_pattern = r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/playlist\?list=([^&]+)'
+    playlist_match = re.search(playlist_pattern, url)
+    if playlist_match:
+        return None, playlist_match.group(1)
+    
+    return None, None
 
 def main(url):
     load_config()
-    video_id = extract_video_id(url)
+    video_id, playlist_id = extract_video_id(url)
     
     if video_id:
         # Single video
@@ -239,20 +251,16 @@ def main(url):
             print(f"Could not fetch information for video {video_id}")
             return
         channel_info = get_channel_info(video_info['channelId'])
-    else:
-        parsed_url = urlparse(url)
-        query_params = parse_qs(parsed_url.query)
-        if 'list' in query_params:
-            # Playlist
-            playlist_id = query_params['list'][0]
-            playlist_info = get_playlist_info(playlist_id)
-            if not playlist_info:
-                print(f"Could not fetch information for playlist {playlist_id}")
-                return
-            channel_info = get_channel_info(playlist_info['channelId'])
-        else:
-            print("Invalid URL. Please provide a valid YouTube video or playlist URL.")
+    elif playlist_id:
+        # Playlist
+        playlist_info = get_playlist_info(playlist_id)
+        if not playlist_info:
+            print(f"Could not fetch information for playlist {playlist_id}")
             return
+        channel_info = get_channel_info(playlist_info['channelId'])
+    else:
+        print("Invalid URL. Please provide a valid YouTube video or playlist URL.")
+        return
     
     if not channel_info:
         print(f"Could not fetch information for channel")
@@ -265,13 +273,19 @@ def main(url):
     cache_file = os.path.join(channel_folder, 'cache.json')
     cache = load_cache(cache_file)
     
-    if video_id:
-        process_video(video_id, cache, channel_folder)
-    else:
+    if playlist_id:
         process_playlist(playlist_id, cache, channel_folder)
+    else:
+        process_video(video_id, cache, channel_folder)
     
     save_cache(cache_file, cache)
 
+    return cache_file
+
 if __name__ == "__main__":
-    url = input("Enter the YouTube video or playlist URL: ")
+    if len(sys.argv) > 1:
+        url = sys.argv[1]
+    else:
+        url = input("Enter the YouTube video or playlist URL: ")
+
     main(url)

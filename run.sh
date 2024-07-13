@@ -6,7 +6,7 @@ cd ~/Sites/llm/youtube-summaries/
 source venv/bin/activate
 
 # Run the Python script
-python src/playlist_transcript_saver.py
+python src/playlist_transcript_saver.py "$1"
 
 # Deactivate virtual environment (optional)
 deactivate
